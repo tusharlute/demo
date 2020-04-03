@@ -1,0 +1,21 @@
+FROM openjdk:8-alpine
+ENV HTTP_PROXY http://vra-prod-us-west-2-proxy.foxinc.com:8080
+ENV HTTPS_PROXY http://vra-prod-us-west-2-proxy.foxinc.com:8080
+RUN export http_proxy=$HTTP_PROXY
+RUN export https_proxy=$HTTPS_PROXY
+RUN apk -v --update add \
+        python \
+        py-pip \
+        groff \
+        less \
+        mailcap \
+        && \
+    pip install --upgrade awscli==1.14.5 s3cmd==2.0.1 python-magic && \
+    apk -v --purge del py-pip && \
+    rm /var/cache/apk/*
+ENV HTTP_PROXY ''
+ENV HTTPS_PROXY ''
+RUN export http_proxy=$HTTP_PROXY
+RUN export https_proxy=$HTTPS_PROXY
+VOLUME /root/.aws
+COPY ./target/DAASAppTemplate-3.0 /usr/local/DAASAppTemplate-3.0
